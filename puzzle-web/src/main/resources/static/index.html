@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <!--    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">-->
+    <title>智能拼图</title>
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="css/puzzle.min.css" type="text/css"/>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+<div id="puzzle">
+    <div class="hint-img"></div>
+    <div class="grid-box"></div>
+    <div class="timer-box">
+        <div class="minutes-box">
+            <div class="minutes-count"></div>
+        </div>
+        <div class="colon">:</div>
+        <div class="seconds-box">
+            <div class="seconds-count"></div>
+        </div>
+    </div>
+    <div class="steps-box">
+        <text>0</text>
+    </div>
+    <div class="button-box">
+        <input id="selec-btn" hidden="hidden" type="file" accept="image/*" onchange="util.selectImg(this)">
+        <button class="btn" onclick="puzzle.run()">开 始 游 戏</button>
+        <button class="btn" onclick="$('#selec-btn').trigger('click')">选 择 图 片</button>
+        <button class="btn" id="auto-btn" onclick="puzzle.auto()" disabled>自 动 完 成</button>
+        <button class="btn" id="hint-btn" disabled>整 图 提 示</button>
+    </div>
+    <div class="process-box">
+        <div class="process-bar"></div>
+    </div>
+    <div class="advice-box"></div>
+    <fieldset class="setting-box">
+        <form>
+            <label>难度选择：</label>
+            <label><input class="diff" type="radio" name="diff" value="3" checked>简单</label>
+            <label><input class="diff" type="radio" name="diff" value="4">容易</label>
+            <label><input class="diff" type="radio" name="diff" value="5">复杂</label>
+            <br/>
+            <label>边框大小：
+                <input type="range" min="0" max="10" step="1" value="1" class="border-size range"
+                       oninput="puzzle.updateBorder(parseInt(this.value))">
+            </label><br/>
+            <label>方块速度：
+                <input type="range" min="0" max="500" step="10" value="120" class="range"
+                       oninput="puzzle.moveSpeed = parseInt(this.value)">
+            </label><br/>
+            <label>自动速度：
+                <input type="range" min="30" max="530" step="10" value="150" class="range"
+                       oninput="puzzle.autoSpeed = parseInt(this.value)">
+            </label><br/>
+            <input class="reset" type="reset" onclick="puzzle.reSet()" value="恢复默认设置">
+        </form>
+    </fieldset>
+</div>
+</body>
+<script src="js/util.min.js"></script>
+<script src="js/game.min.js"></script>
+</html>
