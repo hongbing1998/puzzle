@@ -1,13 +1,15 @@
 package org.edu.cdtu.lhb.puzzleweb.controller;
 
 import org.edu.cdtu.lhb.puzzleutil.util.PuzzleUtil;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-public class Controller {
+public class PuzzleController {
     @PostMapping("auto_complete")
     public List<Integer> autoComplete(@RequestBody Map paramsMap) {
         List<Integer> steps = null;
