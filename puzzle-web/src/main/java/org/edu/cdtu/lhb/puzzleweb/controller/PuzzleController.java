@@ -11,7 +11,7 @@ import java.util.Map;
 @RestController
 public class PuzzleController {
     @PostMapping("auto_complete")
-    public List<Integer> autoComplete(@RequestBody Map paramsMap) {
+    public List<Integer> autoComplete(@RequestBody Map<String, Object> paramsMap) {
         List<Integer> steps = null;
         try {
             int row = (int) paramsMap.get("row");
