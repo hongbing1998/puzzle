@@ -4,6 +4,7 @@ package org.edu.cdtu.lhb.puzzlegui.bean;
 import org.edu.cdtu.lhb.puzzlegui.listener.GridClickListener;
 import org.edu.cdtu.lhb.puzzlegui.listener.MenuItemClickListener;
 import org.edu.cdtu.lhb.puzzlegui.listener.TimeLabelActionListener;
+import org.edu.cdtu.lhb.puzzleutil.PuzzleUtil;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -26,17 +27,17 @@ public class Game {
     private int COL = 3;// 初始总列数
     private Grid blank = new Grid();// 空白格
     private Grid[][] grids;// 主界面显示的所有格子
-    private JPanel back = new JPanel();// 中间后面层
-    private JPanel front = new JPanel();// 中间表面层
     private Picture[] pictures;// 裁剪下来的所有的图片
-    private JFrame mainFrame = new JFrame();// 主窗口
     private BufferedImage picture = null;// 完整的图片
-    private JButton hint = new JButton();// 状态栏提示按钮
-    private JPanel top = new JPanel();// 上部状态栏承载面板
-    private JLabel time = new JLabel();// 状态栏时间显示标签
-    private JLabel step = new JLabel();// 状态栏难度显示标签
-    private JPanel center = new JPanel();// 中间主区域承载面板
-    private CardLayout card = new CardLayout();// 中间主区域卡片布局
+    private final JPanel back = new JPanel();// 中间后面层
+    private final JPanel front = new JPanel();// 中间表面层
+    private final JFrame mainFrame = new JFrame();// 主窗口
+    private final JButton hint = new JButton();// 状态栏提示按钮
+    private final JPanel top = new JPanel();// 上部状态栏承载面板
+    private final JLabel time = new JLabel();// 状态栏时间显示标签
+    private final JLabel step = new JLabel();// 状态栏难度显示标签
+    private final JPanel center = new JPanel();// 中间主区域承载面板
+    private final CardLayout card = new CardLayout();// 中间主区域卡片布局
 
     public Game() {
         super();
@@ -70,9 +71,12 @@ public class Game {
         JMenu more = new JMenu("更多(M)");
 
         // 创建子菜单项
-        JMenuItem base = new JMenuItem("简单(3×3)");
-        JMenuItem middle = new JMenuItem("普通(4×4)");
-        JMenuItem high = new JMenuItem("困难(5×5)");
+        JMenuItem three = new JMenuItem("简单(3×3)");
+        JMenuItem four = new JMenuItem("普通(4×4)");
+        JMenuItem five = new JMenuItem("困难(5×5)");
+        JMenuItem sex = new JMenuItem("超难(6×6)");
+        JMenuItem seven = new JMenuItem("超难(7×7)");
+        JMenuItem eight = new JMenuItem("超难(8×8)");
         JMenuItem autoComplete = new JMenuItem("自动拼图");
         JMenuItem choosePic = new JMenuItem("选择图片");
         JMenuItem exit = new JMenuItem("退 出");
@@ -84,9 +88,12 @@ public class Game {
         MenuItemClickListener menuItemClick = new MenuItemClickListener();
 
         // 设置事件指令
-        base.setActionCommand("base");
-        middle.setActionCommand("middle");
-        high.setActionCommand("high");
+        three.setActionCommand("three");
+        four.setActionCommand("four");
+        five.setActionCommand("five");
+        sex.setActionCommand("sex");
+        seven.setActionCommand("seven");
+        eight.setActionCommand("eight");
         autoComplete.setActionCommand("autoComplete");
         choosePic.setActionCommand("choosePic");
         exit.setActionCommand("exit");
@@ -95,9 +102,12 @@ public class Game {
         about.setActionCommand("about");
 
         // 添加菜单按钮点击事件
-        base.addActionListener(menuItemClick);
-        middle.addActionListener(menuItemClick);
-        high.addActionListener(menuItemClick);
+        three.addActionListener(menuItemClick);
+        four.addActionListener(menuItemClick);
+        five.addActionListener(menuItemClick);
+        sex.addActionListener(menuItemClick);
+        seven.addActionListener(menuItemClick);
+        eight.addActionListener(menuItemClick);
         autoComplete.addActionListener(menuItemClick);
         choosePic.addActionListener(menuItemClick);
         exit.addActionListener(menuItemClick);
@@ -106,9 +116,12 @@ public class Game {
         about.addActionListener(menuItemClick);
 
         // 将菜单项添加到菜单按钮中
-        choise.add(base);
-        choise.add(middle);
-        choise.add(high);
+        choise.add(three);
+        choise.add(four);
+        choise.add(five);
+        choise.add(sex);
+        choise.add(seven);
+        choise.add(eight);
         choise.add(autoComplete);
         choise.add(choosePic);
         choise.addSeparator();
@@ -138,7 +151,7 @@ public class Game {
         step.setFont(new Font("宋体", Font.BOLD, 30));
         step.setForeground(Color.white);
         step.setBorder(BorderFactory.createLoweredBevelBorder());
-        try(InputStream is = this.getClass().getClassLoader().getResourceAsStream("img/smile.jpg")) {
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("img/smile.jpg")) {
             picture = ImageIO.read(Objects.requireNonNull(is));
         } catch (IOException e) {
             e.printStackTrace();
@@ -292,19 +305,18 @@ public class Game {
         return grids;
     }
 
-    public String getRightStatus() {
-        String status = "abcdefghijklmnopqrstuvwxy".substring(0, ROW * COL - 1);
-        return status + '\u0000';
+    public String getRightStr() {
+        return PuzzleUtil.getRightStr(ROW);
     }
 
-    public String getNowStatus() {
+    public String getCurrStr() {
         StringBuilder status = new StringBuilder();
         for (Grid[] grid : grids) {
             for (Grid value : grid) {
-                status.append((char) ('a' + value.getPicture().getOrder()));
+                status.append((char) (PuzzleUtil.FIRST + value.getPicture().getOrder()));
             }
         }
-        status.setCharAt(ROW * COL - 1, '\u0000');
+        status.setCharAt(ROW * COL - 1, PuzzleUtil.SPACE);
         return status.toString();
     }
 

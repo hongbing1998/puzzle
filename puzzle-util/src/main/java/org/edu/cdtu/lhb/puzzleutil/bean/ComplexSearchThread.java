@@ -11,12 +11,12 @@ import java.util.Queue;
  * 复杂难度搜索线程
  */
 public class ComplexSearchThread extends Thread {
-    private int row;// 行数
-    private int col;// 列数
-    private Queue<String> currQueue;// DBFS的工作队列
-    private Map<String, String> thisMap;// 本线程用于存储父状态的map
-    private Map<String, String> anothorMap;// 另一个线程用于存储父状态的map
-    private HashSet<String> visitedStatuses;// 已访问过的状态哈希集合，用于判重
+    private final int row;// 行数
+    private final int col;// 列数
+    private final Queue<String> currQueue;// DBFS的工作队列
+    private final Map<String, String> thisMap;// 本线程用于存储父状态的map
+    private final Map<String, String> anothorMap;// 另一个线程用于存储父状态的map
+    private final HashSet<String> visitedStatuses;// 已访问过的状态哈希集合，用于判重
 
     public ComplexSearchThread(int row, int col, String initStatus, Map<String, String> thisMap, Map<String, String> anothorMap) {
         this.row = row;
@@ -34,8 +34,6 @@ public class ComplexSearchThread extends Thread {
         while (!PuzzleUtil.searched) {
             expand();// 取出队首状态扩展出子状态
         }
-        currQueue = null;
-        visitedStatuses = null;
         PuzzleUtil.cdl.countDown();// 该线程结束，计数器减1
     }
 

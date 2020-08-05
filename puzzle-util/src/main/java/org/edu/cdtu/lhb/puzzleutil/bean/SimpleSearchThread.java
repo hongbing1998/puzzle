@@ -10,12 +10,12 @@ import java.util.Queue;
  * 简单难度搜索线程
  */
 public class SimpleSearchThread extends Thread {
-    private int row;// 行数
-    private int col;// 列数
-    private Queue<String> frontQueue;// DBFS的正向工作队列
-    private Queue<String> backQueue;// DBFS的逆向工作队列
-    private Map<String, String> frontFathorMap;// 用于存储正向父状态的map
-    private Map<String, String> backFathorMap;// 用于存储逆向父状态的map
+    private final int row;// 行数
+    private final int col;// 列数
+    private final Queue<String> frontQueue;// DBFS的正向工作队列
+    private final Queue<String> backQueue;// DBFS的逆向工作队列
+    private final Map<String, String> frontFathorMap;// 用于存储正向父状态的map
+    private final Map<String, String> backFathorMap;// 用于存储逆向父状态的map
 
     public SimpleSearchThread(int row, int col, String initStatus, String finalStatus,
                               Map<String, String> frontFathorMap, Map<String, String> backFathorMap) {
@@ -36,7 +36,6 @@ public class SimpleSearchThread extends Thread {
             expand(frontQueue, frontFathorMap, backFathorMap);// 正向扩展
             expand(backQueue, backFathorMap, frontFathorMap);// 逆向扩展
         }
-        this.frontQueue = this.backQueue = null;
     }
 
     // 将状态进行扩展
@@ -66,8 +65,7 @@ public class SimpleSearchThread extends Thread {
             PuzzleUtil.crossStatus = childStatus;// 记录下这个交汇的状态
         }
         // 该子状态未被映射过，将之映射
-        if (!thisMap.containsKey(childStatus)) {
-            thisMap.put(childStatus, fathorStatus);// 把当前状态映射为子状态的父状态
+        if (thisMap.putIfAbsent(childStatus, fathorStatus) == null) {
             currQueue.offer(childStatus);// 将子状态排入工作队列
         }
     }

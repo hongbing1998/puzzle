@@ -89,7 +89,7 @@ let puzzle = {
         let gWidth = this.gWidth, gHeight = this.gHeight;// 获取格子的宽、高
         this.isMoving = true;// 设置为正在移动
         for (let i = 0; i < row * col - 1; i++) {
-            let ch = String.fromCharCode(97 + i);// 当前格对应的字母
+            let ch = String.fromCharCode(48 + i);// 当前格对应的字母
             let gIndex = this.currStatus.indexOf(ch);// 字母所在的位置索引
             let gRow = Math.floor(gIndex / row), gCol = gIndex % row;// 行、列
             let gTop = gHeight * gRow + (gRow + 1) * bSize;// 位置
@@ -177,13 +177,10 @@ let puzzle = {
         $.ajax({
             url: "auto_complete",
             type: "POST",
-            timeout: 30000,
+            timeout: 10000,
             contentType: "application/json",
             data: JSON.stringify({
-                row: this.row,
-                col: this.col,
-                currStatus: this.currStatus,
-                finalStatus: this.finalStatus
+                currStr: this.currStatus
             }),
             success: function (steps) {
                 processBar.stop(true, true);// 停止进度条，直接到最终状态

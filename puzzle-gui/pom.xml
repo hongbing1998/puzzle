@@ -5,7 +5,7 @@
     <parent>
         <artifactId>puzzle</artifactId>
         <groupId>org.edu.cdtu.lhb</groupId>
-        <version>1.0-RELEASE</version>
+        <version>1.1-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,23 +14,38 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.edu.cdtu.lhb</groupId>
             <artifactId>puzzle-util</artifactId>
-            <version>1.0-RELEASE</version>
+            <version>1.1-RELEASE</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>org.edu.cdtu.lhb.puzzlegui.Puzzle</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -40,19 +40,20 @@
             <label>难度选择：</label>
             <label><input class="diff" type="radio" name="diff" value="3" checked>简单</label>
             <label><input class="diff" type="radio" name="diff" value="4">容易</label>
-            <label><input class="diff" type="radio" name="diff" value="5">复杂</label>
+            <label><input class="diff" type="radio" name="diff" value="5">一般</label>
+            <label><input class="diff" type="radio" name="diff" value="6">复杂</label>
             <br/>
             <label>边框大小：
                 <input type="range" min="0" max="10" step="1" value="1" class="border-size range"
                        oninput="puzzle.updateBorder(parseInt(this.value))">
             </label><br/>
             <label>方块速度：
-                <input type="range" min="0" max="500" step="10" value="120" class="range"
-                       oninput="puzzle.moveSpeed = parseInt(this.value)">
+                <input type="range" min="0" max="500" step="10" value="100" class="range"
+                       oninput="puzzle.moveSpeed = 500 - parseInt(this.value)">
             </label><br/>
             <label>自动速度：
-                <input type="range" min="30" max="530" step="10" value="150" class="range"
-                       oninput="puzzle.autoSpeed = parseInt(this.value)">
+                <input type="range" min="30" max="530" step="10" value="110" class="range"
+                       oninput="puzzle.autoSpeed = 560 - parseInt(this.value)">
             </label><br/>
             <input class="reset" type="reset" onclick="puzzle.reSet()" value="恢复默认设置">
         </form>

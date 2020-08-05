@@ -3,7 +3,7 @@ package org.edu.cdtu.lhb.puzzlegui.listener;
 
 import org.edu.cdtu.lhb.puzzlegui.Puzzle;
 import org.edu.cdtu.lhb.puzzlegui.bean.Grid;
-import org.edu.cdtu.lhb.puzzleutil.util.PuzzleUtil;
+import org.edu.cdtu.lhb.puzzleutil.Intelligetor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -26,14 +26,23 @@ public class MenuItemClickListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "base":
+            case "three":
                 Puzzle.game.restart(3, 3);
                 break;
-            case "middle":
+            case "four":
                 Puzzle.game.restart(4, 4);
                 break;
-            case "high":
+            case "five":
                 Puzzle.game.restart(5, 5);
+                break;
+            case "sex":
+                Puzzle.game.restart(6, 6);
+                break;
+            case "seven":
+                Puzzle.game.restart(7, 7);
+                break;
+            case "eight":
+                Puzzle.game.restart(8, 8);
                 break;
             case "choosePic":
                 choosePic();
@@ -68,24 +77,19 @@ public class MenuItemClickListener implements ActionListener {
     }
 
     private void autoComplete() {
-        int row = Puzzle.game.getROW();
         int col = Puzzle.game.getCOL();
-        String initialStatus = Puzzle.game.getNowStatus();
-        String finalStatus = Puzzle.game.getRightStatus();
+        String currStr = Puzzle.game.getCurrStr();
+        String rightStr = Puzzle.game.getRightStr();
         // 新开线程执行搜索步骤并按步骤拼图
         new Thread(() -> {
-            List<Integer> steps = null;
-            try {
-                steps = PuzzleUtil.searchSteps(initialStatus, finalStatus, row, col);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Intelligetor intelligetor = new Intelligetor(currStr, rightStr);
+            List<Integer> steps = intelligetor.searchSteps();
             Grid[][] grids = Puzzle.game.getGrids();
             assert steps != null;
             for (int step : steps) {
                 int x = (step - 1) / col;
                 int y = (step - 1) % col;
-                grids[x][y].doClick(100);
+                grids[x][y].doClick();
             }
         }).start();
     }
