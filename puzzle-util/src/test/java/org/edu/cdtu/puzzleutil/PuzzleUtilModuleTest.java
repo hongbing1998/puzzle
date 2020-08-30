@@ -15,8 +15,8 @@ public class PuzzleUtilModuleTest {
     @Test
     public void createStatusTest() {
         int size = 6;
-        String rightStr = PuzzleUtil.getRightStr(size);
         String currStr = PuzzleUtil.getSolveAbleStr(size);
+        String rightStr = PuzzleUtil.getRightStr(currStr);
         assert PuzzleUtil.isSolveAble(currStr);
 
         printTitle("可解状态生成测试");
@@ -26,10 +26,9 @@ public class PuzzleUtilModuleTest {
 
     @Test
     public void singleSearchTest() {
-        int size = 7;
-        String rightStr = PuzzleUtil.getRightStr(size);
+        int size = 6;
         String currStr = PuzzleUtil.getSolveAbleStr(size);
-//      currStr = "0@MG1H:N593>LAD=?<EJRFCBP7Q4K628O;I" + PuzzleUtil.SPACE;
+        String rightStr = PuzzleUtil.getRightStr(currStr);
         Intelligetor intelligetor = new Intelligetor(currStr, rightStr);
 
         MeasureTime.start();
@@ -48,10 +47,10 @@ public class PuzzleUtilModuleTest {
 
     @Test
     public void multiSearchTest() {
-        int size = 5;
+        int size = 3;
         String rightStr = PuzzleUtil.getRightStr(size);
         printTitle("批量搜索测试");
-        for (int i = 1; i <= 3000; i++) {
+        for (int i = 1; i <= 500; i++) {
             new Intelligetor(PuzzleUtil.getSolveAbleStr(size), rightStr).searchSteps();
         }
         printHr();
@@ -59,10 +58,11 @@ public class PuzzleUtilModuleTest {
 
     @Test
     public void statistic() {
-        statistic(3, 13);
-        statistic(4, 12);
-        statistic(5, 11);
-        statistic(6, 10);
+//        statistic(3, 400);
+//        statistic(4, 300);
+//        statistic(5, 200);
+//        statistic(6, 100);
+//        statistic(7, 20);
         printHr();
     }
 

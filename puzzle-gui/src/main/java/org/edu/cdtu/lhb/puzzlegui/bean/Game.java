@@ -313,10 +313,10 @@ public class Game {
         StringBuilder status = new StringBuilder();
         for (Grid[] grid : grids) {
             for (Grid value : grid) {
-                status.append((char) (PuzzleUtil.FIRST + value.getPicture().getOrder()));
+                status.append((char) (PuzzleUtil.FIRST_CHARACTER + value.getPicture().getOrder()));
             }
         }
-        status.setCharAt(ROW * COL - 1, PuzzleUtil.SPACE);
+        status.setCharAt(ROW * COL - 1, PuzzleUtil.SPACE_CHARACTER);
         return status.toString();
     }
 

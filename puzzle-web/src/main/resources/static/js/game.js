@@ -42,7 +42,7 @@ let puzzle = {
             let gTop = gHeight * r + (r + 1) * bSize;// 计算当前索引对应的位置
             let gLeft = gWidth * c + (c + 1) * bSize;
             if (i < row * col - 1) {
-                let grid = $("<div class='grid'></div>"); // 创建格子结点
+                let grid = $("<div class='grid'></div>");// 创建格子结点
                 grid.css("top", gTop).css("left", gLeft)
                     .css("width", gWidth).css("height", gHeight)
                     .css("background-position-x", 0 - c * gWidth)

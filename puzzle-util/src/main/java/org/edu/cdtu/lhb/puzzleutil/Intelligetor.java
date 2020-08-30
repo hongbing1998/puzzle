@@ -5,70 +5,94 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author 李红兵
+ */
 public class Intelligetor {
-    private State crossState;// 交汇时状态
-    private boolean timeout;// 是否搜索超时
-    private boolean searched;// 是否已搜索到
-    private final State initState;// 初始状态
-    private final State rightState;//正确状态
-    private final Set<State> frontSet;// 正向已访问状态集合
-    private final Set<State> backSet;// 正向已访问状态集合
-    private final LinkedList<Integer> steps;// 搜索到的步骤列表
-    private final Queue<State> frontQueue;// DBFS的正向工作队列
-    private final Queue<State> backQueue;// DBFS的逆向工作队列
+    private State crossState;
+    private boolean searched;
+    private boolean timeouted;
+    private final State initState;
+    private final State rightState;
+    private final Set<State> frontSet;
+    private final Set<State> backSet;
+    private final LinkedList<Integer> steps;
+    private final Queue<State> frontQueue;
+    private final Queue<State> backQueue;
 
     public Intelligetor(String currStr, String rightStr) {
-        frontSet = new HashSet<>();
-        backSet = new HashSet<>();
         steps = new LinkedList<>();
         char[] currChars = currStr.toCharArray();
         char[] rightChars = rightStr.toCharArray();
         int size = (int) Math.sqrt(currStr.length());
-        frontQueue = size <= 3 ? new LinkedList<>() : new PriorityQueue<>();
-        backQueue = new LinkedList<>();// 3*3采用DBFS算法，更高阶的采用DBFS+A*算法
-        initState = new State(currChars, currStr.indexOf(PuzzleUtil.SPACE), size, PuzzleUtil.calculateScore(currChars), null);
-        rightState = new State(rightChars, rightStr.indexOf(PuzzleUtil.SPACE), size, 0, null);
+        frontSet = new HashSet<>(PuzzleUtil.getSetInitialCapacity(size));
+        backSet = new HashSet<>(PuzzleUtil.getSetInitialCapacity(size));
+        // 3*3采用DBFS算法，更高阶的采用DBFS+A*算法
+        backQueue = new LinkedList<>();
+        frontQueue = size < 4 ? new LinkedList<>() : new PriorityQueue<>(PuzzleUtil.getQueueInitialCapacity(size));
+        initState = new State(currChars, currStr.indexOf(PuzzleUtil.SPACE_CHARACTER), size, PuzzleUtil.calculateScore(currChars), null);
+        rightState = new State(rightChars, rightStr.indexOf(PuzzleUtil.SPACE_CHARACTER), size, 0, null);
     }
 
+    /**
+     * 调用此方法获取拼图的还原步骤
+     */
     public List<Integer> searchSteps() {
         State currState = initState;
-        int size = (int) Math.sqrt(initState.toString().length()), timeoutTimes;
-        for (timeoutTimes = 0; timeoutTimes < size * 4 - 5; timeoutTimes++) {
+        for (int i = 0; i < PuzzleUtil.MAX_TIMEOUT_TIMES; i++) {
             search(currState);
-            if (!timeout) break;
+            if (!timeouted) { return buildSteps(); }
 
-            System.out.printf("%s ──→ %s 第%d次搜索超时\n", initState, currState, (timeoutTimes + 1));
-            // 搜索超时，清理容器，顺时针旋转一周后再重新搜索
+            // 搜索超时，随机移动后重新搜索
+            System.out.printf("%s ──→ %s 第%d次搜索超时\n", initState, currState, (i + 1));
             clearContainers();
 
-            for (int i = 0; i < size - 1; i++) {
-                assert currState != null;
-                currState = currState.moveLeft();
-            }
-            for (int i = 0; i < size - 1; i++) {
-                assert currState != null;
-                currState = currState.moveUp();
-            }
-            for (int i = 0; i < size - 1; i++) {
-                assert currState != null;
-                currState = currState.moveRight();
-            }
-            for (int i = 0; i < size - 1; i++) {
-                assert currState != null;
-                currState = currState.moveDown();
+            currState = randomMove(currState);
+        }
+
+        // 超时最大超时次数，放弃搜索，直接返回空步骤
+        return steps;
+    }
+
+    /**
+     * 随机移动
+     */
+    private State randomMove(State currState) {
+        Random random = new Random();
+        int currDire, prevDire = -1;
+        int moveTimes = 17 + random.nextInt(17);
+        for (int i = 0; i < moveTimes; i++) {
+            currDire = random.nextInt(40) % 4;
+            if (Math.abs(currDire - prevDire) == 2) { continue; }
+            switch ((prevDire = currDire)) {
+                case 0:
+                    currState = currState.moveUp();
+                    break;
+                case 1:
+                    currState = currState.moveRight();
+                    break;
+                case 2:
+                    currState = currState.moveDown();
+                    break;
+                case 3:
+                    currState = currState.moveLeft();
+                    break;
+                default:
             }
         }
 
-        // 旋转（size * 4 - 5）次后又会恢复到初始状态，不再进行旋转，直接返回空步骤
-        return timeoutTimes == size * 4 - 5 ? steps : buildSteps();
+        return currState;
     }
 
+    /**
+     * 从给定的当前状态开始搜索直到搜索到最终正确状态或者搜索超时为止
+     */
     private void search(State currState) {
-        searched = timeout = false;
+        searched = timeouted = false;
         frontQueue.offer(currState);
         backQueue.offer(rightState);
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.schedule(() -> searched = timeout = true, PuzzleUtil.TIMEOUT, TimeUnit.MILLISECONDS);
+        executor.schedule(() -> searched = timeouted = true, PuzzleUtil.SEARCH_TIMEOUT, TimeUnit.MILLISECONDS);
 
         // 进行DBFS步骤搜索
         while (true) {
@@ -80,7 +104,7 @@ public class Intelligetor {
             frontRecord(currState.moveDown());
             frontRecord(currState.moveLeft());
 
-            if (searched) break;
+            if (searched) { break; }
 
             // 从最终状态逆向扩展
             currState = backQueue.poll();
@@ -98,16 +122,14 @@ public class Intelligetor {
      * 记录正向扩展结果
      */
     private void frontRecord(State newState) {
-        if (newState != null) {
-            if (backSet.contains(newState)) {
-                // 逆向结果集中已有记录，结束搜索，并记录该交叉的状态
-                searched = true;
-                crossState = newState;
-            }
+        if (backSet.contains(newState)) {
+            // 逆向结果集中已有记录，结束搜索，并记录该交叉的状态
+            searched = true;
+            crossState = newState;
+        }
 
-            if (frontSet.add(newState)) {
-                frontQueue.offer(newState);
-            }
+        if (frontSet.add(newState)) {
+            frontQueue.offer(newState);
         }
     }
 
@@ -115,10 +137,8 @@ public class Intelligetor {
      * 记录逆向扩展结果
      */
     private void backRecord(State newState) {
-        if (newState != null) {
-            if (backSet.add(newState)) {
-                backQueue.offer(newState);
-            }
+        if (backSet.add(newState)) {
+            backQueue.offer(newState);
         }
     }
 

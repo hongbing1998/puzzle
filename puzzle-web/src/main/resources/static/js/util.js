@@ -7,7 +7,11 @@ let hintBtn = $("#hint-btn"), processBar = $(".process-bar");
 let imgSrc = hintImg.css("backgroundImage");// 存储初始图片路径，用于重置
 let util = {
     getFinalStatus: function (row, col) {
-        return "0123456789:;<=>?@ABCDEFGHIJKLMNOPQR".substring(0, row * col - 1) + '\u0000';
+        let str = "";
+        for (let i = 0; i < row * col - 1; i++) {
+            str += String.fromCharCode(48 + i);
+        }
+        return str + '\u0000';
     },
     createStatus: function (status, row, col) {
         let exchageTime = Math.round(8 + Math.random() * row * col) * 2;// 交换次数（保证是偶数）
