@@ -1,4 +1,6 @@
-package org.edu.cdtu.lhb.puzzleutil;
+package org.edu.cdtu.lhb.puzzleutil.bean;
+
+import org.edu.cdtu.lhb.puzzleutil.util.PuzzleUtil;
 
 import java.util.Arrays;
 

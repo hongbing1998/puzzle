@@ -4,7 +4,7 @@ package org.edu.cdtu.lhb.puzzlegui.bean;
 import org.edu.cdtu.lhb.puzzlegui.listener.GridClickListener;
 import org.edu.cdtu.lhb.puzzlegui.listener.MenuItemClickListener;
 import org.edu.cdtu.lhb.puzzlegui.listener.TimeLabelActionListener;
-import org.edu.cdtu.lhb.puzzleutil.PuzzleUtil;
+import org.edu.cdtu.lhb.puzzleutil.util.PuzzleUtil;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

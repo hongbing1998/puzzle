@@ -1,9 +1,13 @@
 package org.edu.cdtu.lhb.puzzleutil;
 
+import org.edu.cdtu.lhb.puzzleutil.bean.State;
+import org.edu.cdtu.lhb.puzzleutil.util.PuzzleUtil;
+
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author 李红兵
@@ -20,8 +24,9 @@ public class Intelligetor {
     private final Queue<State> frontQueue;
     private final Queue<State> backQueue;
 
-    public Intelligetor(String currStr, String rightStr) {
+    public Intelligetor(String currStr) {
         steps = new LinkedList<>();
+        String rightStr = PuzzleUtil.getRightStr(currStr);
         char[] currChars = currStr.toCharArray();
         char[] rightChars = rightStr.toCharArray();
         int size = (int) Math.sqrt(currStr.length());
@@ -50,7 +55,7 @@ public class Intelligetor {
             currState = randomMove(currState);
         }
 
-        // 超时最大超时次数，放弃搜索，直接返回空步骤
+        // 超过最大超时次数，放弃搜索，直接返回空步骤
         return steps;
     }
 
@@ -147,22 +152,19 @@ public class Intelligetor {
      * 根据搜索结果构建步骤
      */
     private List<Integer> buildSteps() {
-        State crossInFront = crossState, crossInBack = null;
+        State crossInFront = crossState;
 
-        // 找到逆向结果中的最后状态
-        for (State state : backSet) {
-            if (state.equals(crossState)) {
-                crossInBack = state;
-                break;
-            }
-        }
+        // 找到逆向结果中的交叉状态
+        Map<String, State> stateMap = backSet.stream().collect(Collectors.toMap(State::toString, s -> s, (s1, s2) -> s1));
+        State crossInBack = stateMap.get(crossState.toString());
 
         // 在正向结果中逆向拼接步骤
         for (State currState = crossInFront; currState != null; currState = currState.getParent()) {
             steps.addFirst(currState.getPos() + 1);
         }
 
-        steps.removeFirst();// 移除第一步
+        // 第一步是最初始状态，不作为步骤
+        steps.removeFirst();
 
         // 在逆向结果中正向拼接步骤
         assert crossInBack != null;

@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.edu.cdtu.lhb</groupId>
             <artifactId>puzzle-util</artifactId>
-            <version>1.1-RELEASE</version>
+            <version>1.2-RELEASE</version>
         </dependency>
     </dependencies>
 

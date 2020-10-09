@@ -1,7 +1,6 @@
 package org.edu.cdtu.lhb.puzzleweb.controller;
 
 import org.edu.cdtu.lhb.puzzleutil.Intelligetor;
-import org.edu.cdtu.lhb.puzzleutil.PuzzleUtil;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,8 +16,7 @@ public class PuzzleController {
     @PostMapping("auto_complete")
     public List<Integer> autoComplete(@RequestBody Map<String, Object> paramsMap) {
         String currStr = (String) paramsMap.get("currStr");
-        String rightStr = PuzzleUtil.getRightStr(currStr);
-        Intelligetor intelligetor = new Intelligetor(currStr, rightStr);
+        Intelligetor intelligetor = new Intelligetor(currStr);
         return intelligetor.searchSteps();
     }
 }

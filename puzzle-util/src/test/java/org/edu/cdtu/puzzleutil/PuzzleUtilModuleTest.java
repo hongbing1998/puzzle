@@ -1,7 +1,7 @@
 package org.edu.cdtu.puzzleutil;
 
 import org.edu.cdtu.lhb.puzzleutil.Intelligetor;
-import org.edu.cdtu.lhb.puzzleutil.PuzzleUtil;
+import org.edu.cdtu.lhb.puzzleutil.util.PuzzleUtil;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class PuzzleUtilModuleTest {
         int size = 6;
         String currStr = PuzzleUtil.getSolveAbleStr(size);
         String rightStr = PuzzleUtil.getRightStr(currStr);
-        Intelligetor intelligetor = new Intelligetor(currStr, rightStr);
+        Intelligetor intelligetor = new Intelligetor(currStr);
 
         MeasureTime.start();
         List<Integer> steps = intelligetor.searchSteps();
@@ -48,10 +48,9 @@ public class PuzzleUtilModuleTest {
     @Test
     public void multiSearchTest() {
         int size = 3;
-        String rightStr = PuzzleUtil.getRightStr(size);
         printTitle("批量搜索测试");
         for (int i = 1; i <= 500; i++) {
-            new Intelligetor(PuzzleUtil.getSolveAbleStr(size), rightStr).searchSteps();
+            new Intelligetor(PuzzleUtil.getSolveAbleStr(size)).searchSteps();
         }
         printHr();
     }
@@ -73,7 +72,7 @@ public class PuzzleUtilModuleTest {
         ArrayList<Intelligetor> intelligetors = new ArrayList<>();
 
         for (int i = 0; i < number; i++) {
-            intelligetors.add(new Intelligetor(PuzzleUtil.getSolveAbleStr(size), PuzzleUtil.getRightStr(size)));
+            intelligetors.add(new Intelligetor(PuzzleUtil.getSolveAbleStr(size)));
         }
 
         printTitle("时间步数统计");

@@ -11,6 +11,7 @@
 
     <artifactId>puzzle-util</artifactId>
     <packaging>jar</packaging>
+    <version>1.2-RELEASE</version>
 
     <dependencies>
         <dependency>

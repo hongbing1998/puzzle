@@ -79,10 +79,9 @@ public class MenuItemClickListener implements ActionListener {
     private void autoComplete() {
         int col = Puzzle.game.getCOL();
         String currStr = Puzzle.game.getCurrStr();
-        String rightStr = Puzzle.game.getRightStr();
         // 新开线程执行搜索步骤并按步骤拼图
         new Thread(() -> {
-            Intelligetor intelligetor = new Intelligetor(currStr, rightStr);
+            Intelligetor intelligetor = new Intelligetor(currStr);
             List<Integer> steps = intelligetor.searchSteps();
             Grid[][] grids = Puzzle.game.getGrids();
             assert steps != null;

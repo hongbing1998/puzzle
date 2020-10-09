@@ -1,76 +1,128 @@
 package org.edu.cdtu.lhb.puzzleutil.util;
 
-import org.edu.cdtu.lhb.puzzleutil.bean.ComplexSearchThread;
-import org.edu.cdtu.lhb.puzzleutil.bean.SimpleSearchThread;
+import java.util.stream.IntStream;
 
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
+/**
+ * 拼图工具类，针对系统提供了一些通用方法，以及一些常量的维护
+ *
+ * @author 李红兵
+ */
 public class PuzzleUtil {
-    public static String crossStatus;// 交汇时的状态
-    public static Boolean searched;// 是否搜索到标志
-    public static CountDownLatch cdl;// 执行中线程计数器
-    private static Map<String, String> frontFathorMap;// 用于存储正向父状态的map
-    private static Map<String, String> backFathorMap;// 用于存储父反向状态的map
+    /*状态字符串空白格字符*/
+    public static final char SPACE_CHARACTER = 0;
+    /*状态字符串的起始字符*/
+    public static final char FIRST_CHARACTER = '0';
+    /*搜索超时时间*/
+    public static final int SEARCH_TIMEOUT = 300;
+    /*最大超时次数*/
+    public static final int MAX_TIMEOUT_TIMES = 10;
 
     /**
-     * 获取复原步骤，线程安全
-     * 状态用小写字母字符串按顺序表示，空白格用\u0000（ASCII码为0的字符）表示，
-     * 返回的步骤是一个数字列表，表示点击第几格，下标从1开始
-     *
-     * @param initStatus  初始状态
-     * @param finalStatus 最终状态
-     * @param row         行数
-     * @param col         列数
+     * 传入所有字符计算总分数
      */
-    public static synchronized List<Integer> searchSteps(String initStatus, String finalStatus, int row, int col) throws InterruptedException {
-        searched = false;// 初始化是否搜索到标志
-        frontFathorMap = new HashMap<>();
-        backFathorMap = new HashMap<>();
-        if (row * col <= 9) {
-            Thread searchThread = new SimpleSearchThread(row, col, initStatus, finalStatus, frontFathorMap, backFathorMap);
-            searchThread.start();// 开始单线程双向广搜
-            searchThread.join();// 单线程创建一个线程的计数器也行，这里直接将搜索线程与主线程（依赖线程）合并
-        } else {
-            cdl = new CountDownLatch(2);// 创建两个线程的计数器
-            Thread frontSearchThread = new ComplexSearchThread(row, col, initStatus, frontFathorMap, backFathorMap);
-            Thread backSearchThread = new ComplexSearchThread(row, col, finalStatus, backFathorMap, frontFathorMap);
-            frontSearchThread.start();// 开始正向搜索线程
-            backSearchThread.start();// 开始逆向搜索线程
-            // 阻塞等待所有线程执行完毕或者超时
-            if (!cdl.await(15, TimeUnit.SECONDS)) {
-                searched = true;// 超时，手动设为已搜索到，以达到终止线程的目的
-                return new ArrayList<>();// 超时，停止运行，返回空步骤
+    public static int calculateScore(char[] chars) {
+        int score = 0, size = (int) Math.sqrt(chars.length), rightPos, rowDis, colDis, currChar;
+        for (int currPos = 0; currPos < chars.length; currPos++) {
+            currChar = chars[currPos];
+            if (currChar != SPACE_CHARACTER) {
+                rightPos = currChar - FIRST_CHARACTER;
+                rowDis = (rightPos - currPos) / size;
+                colDis = rightPos % size - currPos % size;
+                score += (int) Math.sqrt(rowDis * rowDis + colDis * colDis);
             }
         }
-        return buildSteps(initStatus, finalStatus);// 返回构建好的步骤列表
+
+        return score;
     }
 
-    // 根据双向广搜搜索结果构建步骤
-    private static List<Integer> buildSteps(String initStatus, String finalStatus) {
-        LinkedList<Integer> steps = new LinkedList<>();// 步骤列表
-        String currStep = crossStatus;// 当前处于交汇处
-        // 在正向搜索结果中拼接从交汇处到初始状态的步骤
-        // 但需要的是从初始状态到交汇处的步骤，所以每次步骤填充到步骤队列头
-        while (!currStep.equals(initStatus)) {
-            steps.addFirst(currStep.indexOf('\u0000') + 1);// 将步骤序号填充到链表头
-            currStep = frontFathorMap.get(currStep);// 在fathorMap中一级一级往前找
+    /**
+     * 根据规格获取最终的正确状态字符串
+     */
+    public static String getRightStr(int size) {
+        StringBuilder builder = new StringBuilder();
+        IntStream.range(FIRST_CHARACTER, FIRST_CHARACTER + size * size).forEach(n -> builder.append((char) n));
+        builder.setCharAt(size * size - 1, SPACE_CHARACTER);
+        return builder.toString();
+    }
+
+    /**
+     * 根据当前状态字符串获取最终的正确状态字符串
+     */
+    public static String getRightStr(String currStr) {
+        int size = (int) Math.sqrt(currStr.length());
+        return getRightStr(size);
+    }
+
+
+    /**
+     * 生成可解状态（随机交换除最后一位的所有位偶数次）
+     */
+    public static String getSolveAbleStr(int size) {
+        StringBuilder builder = new StringBuilder(getRightStr(size));
+        int exchageTime = (int) (5 + Math.random() * size * size) * 2;
+        // 随机交换除空白格的其他格偶数次
+        for (int i = 0; i < exchageTime; i++) {
+            int index1 = 0, index2 = 0;
+            // 生成两个不相等的随机下标（不包含最后一个）
+            while (index1 == index2) {
+                index1 = (int) (Math.random() * (size * size - 1));
+                index2 = (int) (Math.random() * (size * size - 1));
+            }
+            char char1 = builder.charAt(index1);
+            char char2 = builder.charAt(index2);
+            builder.setCharAt(index1, char2);
+            builder.setCharAt(index2, char1);
         }
-        currStep = crossStatus;// 回到交汇处
-        // 在逆向搜索结果中拼接从交汇处到最终状态的步骤，每一步直接填充到步骤队列尾
-        while (!currStep.equals(finalStatus)) {
-            currStep = backFathorMap.get(currStep);// 在fathorMap中一级一级往前找
-            steps.addLast(currStep.indexOf('\u0000') + 1);// 将步骤序号填充到链表尾
+        return builder.toString();
+    }
+
+    /**
+     * 判断当前状态是否可解
+     */
+    public static boolean isSolveAble(String currStr) {
+        boolean solveAble = true;
+        char[] chars = currStr.replace(SPACE_CHARACTER, (char) (FIRST_CHARACTER + currStr.length() - 1)).toCharArray();
+        for (int i = 0; i < chars.length - 1; i++) {
+            for (int j = i + 1; j < chars.length; j++) {
+                if (chars[i] > chars[j]) { solveAble = !solveAble; }
+            }
         }
-        // 如果正向线程太快（逆向线程抢占不到CPU），已经搜索出了最终状态，这时候最后两步就是重复的，需要移除
-        if (steps.size() > 2 && steps.get(steps.size() - 3) == finalStatus.indexOf('\u0000') + 1) {
-            steps.removeLast();
-            steps.removeLast();
+        return solveAble;
+    }
+
+    /**
+     * 根据规格获取Set容器初始容量
+     */
+    public static int getSetInitialCapacity(int size) {
+        switch (size) {
+            case 3:
+                return 1450;
+            case 4:
+                return 3250;
+            case 5:
+                return 20000;
+            case 6:
+                return 130000;
+            default:
+                return 200000;
         }
-        frontFathorMap.clear();// 用完清空容器
-        backFathorMap.clear();
-        frontFathorMap = backFathorMap = null;
-        return steps;
+    }
+
+    /**
+     * 根据规格获取Queue容器初始容量
+     */
+    public static int getQueueInitialCapacity(int size) {
+        switch (size) {
+            case 3:
+                return 550;
+            case 4:
+                return 1650;
+            case 5:
+                return 11000;
+            case 6:
+                return 75000;
+            default:
+                return 100000;
+        }
     }
 }
